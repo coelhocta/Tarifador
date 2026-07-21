@@ -16,7 +16,7 @@ Versão:
 =========================================================
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 
 
@@ -48,15 +48,10 @@ def somente_digitos(texto: str | None) -> str:
 # ==========================================================
 
 def texto_para_data_hora(texto: str) -> datetime:
-    """
-    Converte texto para datetime.
-
-    Formato esperado:
-
-        YYYY-MM-DD HH:MM:SS
-    """
-
-    return datetime.strptime(texto, "%Y-%m-%d %H:%M:%S")
+    return datetime.strptime(
+        texto,
+        "%d/%m/%Y %H:%M:%S",
+    )
 
 
 def data_hora_para_texto(data: datetime) -> str:
@@ -131,3 +126,44 @@ def esta_vazio(valor) -> bool:
         return valor.strip() == ""
 
     return False
+
+# ==========================================================
+# Chaves do SATA
+# ==========================================================
+
+def gerar_chave_comparacao(
+    data_hora: datetime,
+    destino: str,
+) -> str:
+    """
+    Gera a chave principal utilizada na conciliação.
+
+    Formato:
+
+        AAAA-MM-DD HH:MM|TELEFONE
+
+    Os segundos são ignorados.
+    """
+
+    telefone = somente_digitos(destino)
+
+    minuto = data_hora.replace(second=0, microsecond=0)
+
+    return f"{minuto:%Y-%m-%d %H:%M}|{telefone}"
+
+
+def gerar_chave_comparacao_proximo_minuto(
+    data_hora: datetime,
+    destino: str,
+) -> str:
+    """
+    Gera a chave considerando o minuto seguinte.
+
+    Utilizada para compensar diferenças de arredondamento
+    entre o Asterisk e a operadora.
+    """
+
+    return gerar_chave_comparacao(
+        data_hora + timedelta(minutes=1),
+        destino,
+    )

@@ -16,7 +16,7 @@ Versão:
 =========================================================
 """
 
-from telefone import (
+from core.telefone import (
     remover_prefixo_internacional,
     remover_prefixo_operadora,
     remover_zero_inicial,
