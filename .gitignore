@@ -16,25 +16,23 @@ logs/
 temp/
 *.log
 
-# Arquivos do sistema
-.DS_Store
-Thumbs.db
-
-# Pytest
+# Cache
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Cobertura de testes
+# Cobertura
 .coverage
 htmlcov/
 
-# Distribuição
+# Build
 dist/
 build/
 *.egg-info/
 
-# Cache
-.mypy_cache/
-.ruff_cache/
+# Sistema
+.DS_Store
+Thumbs.db
 
 # Arquivos locais
 .env
