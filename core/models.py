@@ -139,6 +139,8 @@ class ChamadaAsterisk(Chamada):
     ramal: str
 
     nome_ramal: str
+    
+    uniqueid: str
 
 
 # ==========================================================
