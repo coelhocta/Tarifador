@@ -2,61 +2,85 @@
 
 import csv
 import re
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 ARQUIVO_CDR = "/var/log/asterisk/cdr-csv/Master.csv"
 ARQUIVO_RAMAIS = "/etc/asterisk/pjsip.ramais"
 
 # ==========================================================
-# Descobre o mês anterior
+# Índices do Master.csv (cdr_csv)
 # ==========================================================
 
-hoje = datetime.today()
+IDX_SRC = 1
+IDX_DST = 2
+IDX_CONTEXT = 3
+IDX_START = 9
+IDX_BILLSEC = 13
+IDX_DISPOSITION = 14
+IDX_UNIQUEID = 16
 
-if hoje.month == 1:
-    ano = hoje.year - 1
-    mes = 12
-else:
-    ano = hoje.year
-    mes = hoje.month - 1
+# ==========================================================
+# Descobre o período de exportação
+# (Mês retrasado + mês anterior)
+# ==========================================================
+
+hoje = date.today()
+
+primeiro_dia_mes_atual = hoje.replace(day=1)
+ultimo_dia_mes_anterior = primeiro_dia_mes_atual - timedelta(days=1)
+primeiro_dia_mes_anterior = ultimo_dia_mes_anterior.replace(day=1)
+
+ultimo_dia_mes_retrasado = primeiro_dia_mes_anterior - timedelta(days=1)
+primeiro_dia_mes_retrasado = ultimo_dia_mes_retrasado.replace(day=1)
+
+data_inicio = primeiro_dia_mes_retrasado
+data_fim = ultimo_dia_mes_anterior
 
 meses = [
     "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
     "Jul", "Ago", "Set", "Out", "Nov", "Dez"
 ]
 
-arquivo_saida = f"{meses[mes - 1]}.{str(ano)[2:]}.ASTERISK.csv"
+arquivo_saida = (
+    f"{meses[primeiro_dia_mes_anterior.month - 1]}."
+    f"{str(primeiro_dia_mes_anterior.year)[2:]}"
+    ".ASTERISK.csv"
+)
 
 # ==========================================================
 # Carrega os nomes dos ramais
 # ==========================================================
 
-ramais = {}
+def carregar_ramais():
 
-with open(ARQUIVO_RAMAIS, encoding="utf-8") as f:
+    ramais = {}
 
-    ramal = None
+    with open(ARQUIVO_RAMAIS, encoding="utf-8") as arquivo:
 
-    for linha in f:
+        ramal = None
 
-        linha = linha.strip()
+        for linha in arquivo:
 
-        m = re.match(r"\[(\d+)\]\(endpoint\)", linha)
+            linha = linha.strip()
 
-        if m:
-            ramal = m.group(1)
-            ramais[ramal] = ""
-            continue
-
-        if ramal is None:
-            continue
-
-        if linha.startswith("callerid="):
-
-            m = re.search(r'"(.*?)"', linha)
+            m = re.match(r"\[(\d+)\]\(endpoint\)", linha)
 
             if m:
-                ramais[ramal] = m.group(1)
+                ramal = m.group(1)
+                ramais[ramal] = ""
+                continue
+
+            if ramal is None:
+                continue
+
+            if linha.startswith("callerid="):
+
+                m = re.search(r'"(.*?)"', linha)
+
+                if m:
+                    ramais[ramal] = m.group(1)
+
+    return ramais
 
 # ==========================================================
 # Normaliza número telefônico
@@ -66,121 +90,137 @@ def normaliza_numero(numero):
 
     numero = "".join(c for c in numero if c.isdigit())
 
-    # Remove prefixo internacional (00)
     while numero.startswith("00"):
         numero = numero[2:]
 
-    # Remove CSP (015,021,031...)
     if numero.startswith("0") and len(numero) >= 12:
         numero = numero[3:]
 
-    # Remove zero restante
     if numero.startswith("0"):
         numero = numero[1:]
 
     return numero
 
 # ==========================================================
-# Lê o CDR
+# Exporta chamadas
 # ==========================================================
 
-linhas_saida = []
+def exportar_chamadas():
 
-with open(ARQUIVO_CDR, newline="", encoding="utf-8") as entrada:
+    ramais = carregar_ramais()
 
-    leitor = csv.reader(entrada)
+    linhas_saida = []
 
-    for linha in leitor:
+    with open(ARQUIVO_CDR, newline="", encoding="utf-8") as entrada:
 
-        if len(linha) < 15:
-            continue
+        leitor = csv.reader(entrada)
 
-        contexto = linha[3].strip('"')
+        for linha in leitor:
 
-        if contexto != "externo":
-            continue
+            if len(linha) <= IDX_UNIQUEID:
+                continue
 
-        status = linha[14].strip('"')
+            contexto = linha[IDX_CONTEXT].strip('"')
 
-        if status != "ANSWERED":
-            continue
+            if contexto != "externo":
+                continue
 
-        origem = linha[1].strip('"')
-        destino = linha[2].strip('"')
+            status = linha[IDX_DISPOSITION].strip('"')
 
-        if not destino:
-            continue
+            if status != "ANSWERED":
+                continue
 
-        # Origem deve ser um ramal
-        if not (origem.isdigit() and len(origem) == 4):
-            continue
+            origem = linha[IDX_SRC].strip('"')
 
-        # Ignora ramal -> ramal
-        if destino.isdigit() and len(destino) == 4:
-            continue
+            destino = linha[IDX_DST].strip('"')
 
-        inicio = linha[9].strip('"')
+            if not destino:
+                continue
 
-        if not inicio:
-            continue
+            if not any(c.isdigit() for c in destino):
+                continue
 
-        dt = datetime.strptime(inicio, "%Y-%m-%d %H:%M:%S")
+            if not (origem.isdigit() and len(origem) == 4):
+                continue
 
-        # Apenas mês anterior
-        if dt.year != ano or dt.month != mes:
-            continue
+            if destino.isdigit() and len(destino) == 4:
+                continue
 
-        destino = normaliza_numero(destino)
+            inicio = linha[IDX_START].strip('"')
 
-        # Descarta números inválidos
-        if len(destino) < 8:
-            continue
+            if not inicio:
+                continue
 
-        linhas_saida.append([
-            origem,
-            ramais.get(origem, ""),
-            dt.strftime("%d/%m/%Y"),
-            dt.strftime("%H:%M:%S"),
-            int(linha[13]),
-            destino
+            dt = datetime.strptime(
+                inicio,
+                "%Y-%m-%d %H:%M:%S"
+            )
+
+            if not (data_inicio <= dt.date() <= data_fim):
+                continue
+
+            destino = normaliza_numero(destino)
+
+            # O SATA fará a validação completa do número.
+            # Aqui descartamos apenas destinos claramente inválidos.
+            if len(destino) < 8:
+                continue
+
+            linhas_saida.append([
+                origem,
+                ramais.get(origem, ""),
+                dt.strftime("%d/%m/%Y"),
+                dt.strftime("%H:%M:%S"),
+                int(linha[IDX_BILLSEC]),
+                destino,
+                linha[IDX_UNIQUEID].strip('"')
+            ])
+
+    linhas_saida.sort(
+        key=lambda x: datetime.strptime(
+            x[3] + " " + x[4],
+            "%d/%m/%Y %H:%M:%S"
+        )
+    )
+
+    with open(
+        arquivo_saida,
+        "w",
+        newline="",
+        encoding="utf-8-sig"
+    ) as saida:
+
+        escritor = csv.writer(saida, delimiter=";")
+
+        escritor.writerow([
+            "Ramal",
+            "Nome",
+            "Data",
+            "Hora",
+            "Duracao",
+            "Destino",
+            "UniqueID"
         ])
 
-# ==========================================================
-# Ordena por data/hora
-# ==========================================================
+        escritor.writerows(linhas_saida)
 
-linhas_saida.sort(
-    key=lambda x: datetime.strptime(
-        x[2] + " " + x[3],
-        "%d/%m/%Y %H:%M:%S"
+    print()
+    print("=" * 60)
+    print("EXPORTAÇÃO DE CHAMADAS - SATA")
+    print("=" * 60)
+    print(
+        "Período........: "
+        f"{data_inicio.strftime('%d/%m/%Y')} até "
+        f"{data_fim.strftime('%d/%m/%Y')}"
     )
-)
+    print(f"Chamadas.......: {len(linhas_saida)}")
+    print(f"Arquivo........: {arquivo_saida}")
+    print("=" * 60)
+    print()
 
 # ==========================================================
-# Grava CSV
+# Programa principal
 # ==========================================================
 
-with open(arquivo_saida, "w", newline="", encoding="utf-8-sig") as saida:
-
-    escritor = csv.writer(saida, delimiter=";")
-
-    escritor.writerow([
-        "Ramal",
-        "Nome",
-        "Data",
-        "Hora",
-        "Duracao",
-        "Destino"
-    ])
-
-    escritor.writerows(linhas_saida)
-
-print()
-print("=" * 60)
-print("EXPORTAÇÃO DE CHAMADAS - SATA")
-print("=" * 60)
-print(f"Período........: {meses[mes - 1]}/{ano}")
-print(f"Chamadas.......: {len(linhas_saida)}")
-print(f"Arquivo........: {arquivo_saida}")
-print("=" * 60)
-print()
+if __name__ == "__main__":
+    exportar_chamadas()
