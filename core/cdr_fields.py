@@ -1,5 +1,17 @@
 """
-Índices das colunas do Master.csv
+=========================================================
+SATA
+
+Sistema de Auditoria Telefônica para Asterisk
+
+Arquivo:
+    cdr_fields.py
+
+Descrição:
+    Índices das colunas do arquivo Master.csv
+    gerado pelo Asterisk (cdr_csv).
+
+=========================================================
 """
 
 ACCOUNTCODE = 0
