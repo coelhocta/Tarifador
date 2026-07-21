@@ -178,7 +178,7 @@ def exportar_chamadas():
 
     linhas_saida.sort(
         key=lambda x: datetime.strptime(
-            x[3] + " " + x[4],
+            x[2] + " " + x[3],
             "%d/%m/%Y %H:%M:%S"
         )
     )
