@@ -1,0 +1,39 @@
+"""
+Índices das colunas do Master.csv
+"""
+
+ACCOUNTCODE = 0
+
+ORIGEM = 1
+
+DESTINO = 2
+
+CONTEXTO = 3
+
+CALLERID = 4
+
+CHANNEL = 5
+
+DSTCHANNEL = 6
+
+LASTAPP = 7
+
+LASTDATA = 8
+
+INICIO = 9
+
+ATENDIMENTO = 10
+
+FIM = 11
+
+DURACAO = 12
+
+BILLSEC = 13
+
+STATUS = 14
+
+AMAFLAGS = 15
+
+UNIQUEID = 16
+
+USERFIELD = 17
