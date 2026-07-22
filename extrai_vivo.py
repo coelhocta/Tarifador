@@ -20,7 +20,22 @@ Versão:
 from pathlib import Path
 
 import pdfplumber
+import re
+from dataclasses import dataclass
 
+@dataclass(slots=True)
+class LinhaVivo:
+    data: str
+    hora: str
+    duracao: str
+    numero: str
+    destino: str
+    tipo: str
+    valor: str
+
+REGEX_DATA = re.compile(
+    r"^\d{2}/\d{2}/\d{4}"
+)
 
 def extrair_pdf(
     arquivo_pdf: Path,
@@ -60,3 +75,13 @@ def _extrair_linhas(
             linhas.extend(texto.splitlines())
 
     return linhas
+
+
+def _eh_ligacao(
+    linha: str,
+) -> bool:
+    """
+    Retorna True quando a linha representa uma ligação.
+    """
+
+    return bool(REGEX_DATA.match(linha))
