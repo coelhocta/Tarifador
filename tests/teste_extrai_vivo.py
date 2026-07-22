@@ -7,6 +7,7 @@ from extrai_vivo import _extrair_linhas
 from extrai_vivo import _eh_ligacao
 from extrai_vivo import LigacaoVivoBruta
 from extrai_vivo import _converter_linha
+from extrai_vivo import _extrair_chamadas
 
 
 ARQUIVO_VALIDO = (
@@ -145,3 +146,22 @@ def teste_converter_linha_vc2():
 
     assert ligacao.destino == "AREA-016"
     assert ligacao.tipo == "VC2"
+    
+
+def teste_extrair_chamadas():
+
+    linhas = [
+        "Telefônica Brasil S/A",
+        "PÁGINA: 34/41",
+        "Data Hora Duração Número de Destino Destino Tipo Valor da Ligação",
+        "18/06/2026 13:34:24 00:04:42 99838-1378 AREA-035 VC3 R$ 4,18",
+        "18/06/2026 13:37:24 00:01:00 3227-8099 BAURU DDD R$ 0,61",
+        "SUBTOTAL R$ 4,79",
+    ]
+
+    ligacoes = _extrair_chamadas(linhas)
+
+    assert len(ligacoes) == 2
+
+    assert ligacoes[0].numero == "99838-1378"
+    assert ligacoes[1].numero == "3227-8099"

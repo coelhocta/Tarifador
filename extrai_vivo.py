@@ -130,3 +130,21 @@ def _converter_linha(
         tipo=correspondencia.group(6),
         valor=correspondencia.group(7),
     )
+    
+    
+def _extrair_chamadas(
+    linhas: list[str],
+) -> list[LigacaoVivoBruta]:
+
+    ligacoes = []
+
+    for linha in linhas:
+
+        if not _eh_ligacao(linha):
+            continue
+
+        ligacoes.append(
+            _converter_linha(linha)
+        )
+
+    return ligacoes
