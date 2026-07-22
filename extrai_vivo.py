@@ -25,6 +25,8 @@ from dataclasses import dataclass
 
 @dataclass(slots=True)
 class LinhaVivo:
+    """Representa uma linha de ligação extraída da fatura da Vivo."""
+
     data: str
     hora: str
     duracao: str
@@ -35,6 +37,29 @@ class LinhaVivo:
 
 REGEX_DATA = re.compile(
     r"^\d{2}/\d{2}/\d{4}"
+)
+
+REGEX_LIGACAO = re.compile(
+    r"""
+    ^
+    (\d{2}/\d{2}/\d{4})      # Data
+    \s+
+    (\d{2}:\d{2}:\d{2})      # Hora
+    \s+
+    (\d{2}:\d{2}:\d{2})      # Duração
+    \s+
+    (\S+)                    # Número
+    \s+
+    (.+?)                    # Destino (1 ou mais palavras)
+    \s+
+    (\S+)                    # Tipo (DDD, VC2, VC3, DDI, VOZ, etc.)
+    \s+
+    R\$
+    \s+
+    ([\d,]+)                 # Valor
+    $
+    """,
+    re.VERBOSE,
 )
 
 def extrair_pdf(
@@ -85,3 +110,23 @@ def _eh_ligacao(
     """
 
     return bool(REGEX_DATA.match(linha))
+
+
+def _converter_linha(
+    linha: str,
+) -> LinhaVivo:
+
+    correspondencia = REGEX_LIGACAO.match(linha)
+
+    if correspondencia is None:
+        raise ValueError(f"Linha inválida: {linha}")
+
+    return LinhaVivo(
+        data=correspondencia.group(1),
+        hora=correspondencia.group(2),
+        duracao=correspondencia.group(3),
+        numero=correspondencia.group(4),
+        destino=correspondencia.group(5),
+        tipo=correspondencia.group(6),
+        valor=correspondencia.group(7),
+    )
