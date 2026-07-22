@@ -152,5 +152,3 @@ class ChamadaVivo(Chamada):
     """Registro proveniente da fatura Vivo."""
 
     valor: Decimal = Decimal("0")
-
-    categoria_vivo: str = ""
