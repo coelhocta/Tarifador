@@ -56,7 +56,7 @@ class LigacaoVivoBruta:
         ]
 
 REGEX_DATA = re.compile(
-    r"^\d{2}/\d{2}/\d{4}"
+    r"^\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2}"
 )
 
 REGEX_LIGACAO = re.compile(
@@ -94,6 +94,13 @@ def extrair_pdf(
         raise FileNotFoundError(arquivo_pdf)
 
     linhas = _extrair_linhas(arquivo_pdf)
+
+    ligacoes = _extrair_chamadas(linhas)
+
+    _gravar_csv(
+        ligacoes,
+        arquivo_csv,
+    )
 
 
 def _extrair_linhas(
@@ -163,9 +170,11 @@ def _extrair_chamadas(
         if not _eh_ligacao(linha):
             continue
 
+        print(repr(linha))
+
         ligacoes.append(
             _converter_linha(linha)
-        )
+    )
 
     return ligacoes
 
@@ -192,3 +201,17 @@ def _gravar_csv(
             writer.writerow(
                 ligacao.para_lista()
             )
+            
+            
+if __name__ == "__main__":
+
+    arquivo_pdf = Path("dados_teste") / "vivo_fatura_valida.pdf"
+
+    arquivo_csv = Path("dados_teste") / "Jun.26.VIVO.csv"
+
+    extrair_pdf(
+        arquivo_pdf,
+        arquivo_csv,
+    )
+
+    print(f"CSV gerado: {arquivo_csv}")

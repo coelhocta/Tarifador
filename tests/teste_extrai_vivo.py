@@ -57,6 +57,11 @@ def teste_eh_ligacao():
     )
 
 
+def teste_data_sozinha_nao_e_ligacao():
+
+    assert not _eh_ligacao("27/07/2026")
+
+
 def teste_cabecalho_nao_e_ligacao():
 
     assert not _eh_ligacao(
