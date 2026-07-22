@@ -24,7 +24,7 @@ import re
 from dataclasses import dataclass
 
 @dataclass(slots=True)
-class LinhaVivo:
+class LigacaoVivoBruta:
     """Representa uma linha de ligação extraída da fatura da Vivo."""
 
     data: str
@@ -114,14 +114,14 @@ def _eh_ligacao(
 
 def _converter_linha(
     linha: str,
-) -> LinhaVivo:
+) -> LigacaoVivoBruta:
 
     correspondencia = REGEX_LIGACAO.match(linha)
 
     if correspondencia is None:
         raise ValueError(f"Linha inválida: {linha}")
 
-    return LinhaVivo(
+    return LigacaoVivoBruta(
         data=correspondencia.group(1),
         hora=correspondencia.group(2),
         duracao=correspondencia.group(3),

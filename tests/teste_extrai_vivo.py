@@ -5,7 +5,7 @@ import pytest
 from extrai_vivo import extrair_pdf
 from extrai_vivo import _extrair_linhas
 from extrai_vivo import _eh_ligacao
-from extrai_vivo import LinhaVivo
+from extrai_vivo import LigacaoVivoBruta
 from extrai_vivo import _converter_linha
 
 
@@ -85,11 +85,11 @@ def teste_pagina_nao_e_ligacao():
     
 def teste_converter_linha_vc3():
 
-    linha = _converter_linha(
+    ligacao = _converter_linha(
         "18/06/2026 13:34:24 00:04:42 99838-1378 AREA-035 VC3 R$ 4,18"
     )
 
-    assert linha == LinhaVivo(
+    assert ligacao == LigacaoVivoBruta(
         data="18/06/2026",
         hora="13:34:24",
         duracao="00:04:42",
@@ -102,11 +102,11 @@ def teste_converter_linha_vc3():
 
 def teste_converter_linha_ddd_destino_uma_palavra():
 
-    linha = _converter_linha(
+    ligacao = _converter_linha(
         "18/06/2026 13:37:24 00:01:00 3227-8099 BAURU DDD R$ 0,61"
     )
 
-    assert linha == LinhaVivo(
+    assert ligacao == LigacaoVivoBruta(
         data="18/06/2026",
         hora="13:37:24",
         duracao="00:01:00",
@@ -119,29 +119,29 @@ def teste_converter_linha_ddd_destino_uma_palavra():
 
 def teste_converter_linha_ddd_destino_duas_palavras():
 
-    linha = _converter_linha(
+    ligacao = _converter_linha(
         "09/06/2026 14:48:42 00:20:24 2224-7050 SAO PAULO DDD R$ 12,64"
     )
 
-    assert linha.destino == "SAO PAULO"
-    assert linha.tipo == "DDD"
-    
-    
+    assert ligacao.destino == "SAO PAULO"
+    assert ligacao.tipo == "DDD"
+
+
 def teste_converter_linha_ddd_destino_quatro_palavras():
 
-    linha = _converter_linha(
+    ligacao = _converter_linha(
         "09/06/2026 12:50:06 00:01:00 3203-4091 SAO JOSE DO RIO DDD R$ 0,61"
     )
 
-    assert linha.destino == "SAO JOSE DO RIO"
-    assert linha.tipo == "DDD"
-    
-    
+    assert ligacao.destino == "SAO JOSE DO RIO"
+    assert ligacao.tipo == "DDD"
+
+
 def teste_converter_linha_vc2():
 
-    linha = _converter_linha(
+    ligacao = _converter_linha(
         "09/06/2026 13:43:24 00:00:36 99760-7445 AREA-016 VC2 R$ 0,49"
     )
 
-    assert linha.destino == "AREA-016"
-    assert linha.tipo == "VC2"
+    assert ligacao.destino == "AREA-016"
+    assert ligacao.tipo == "VC2"
