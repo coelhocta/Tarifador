@@ -33,5 +33,30 @@ def extrair_pdf(
     if not arquivo_pdf.exists():
         raise FileNotFoundError(arquivo_pdf)
 
-    with pdfplumber.open(arquivo_pdf):
-        pass
+    linhas = _extrair_linhas(arquivo_pdf)
+
+
+def _extrair_linhas(
+    arquivo_pdf: Path,
+) -> list[str]:
+    """
+    Extrai todas as linhas do PDF.
+
+    O retorno preserva apenas a ordem das linhas,
+    independentemente da página onde estavam.
+    """
+
+    linhas = []
+
+    with pdfplumber.open(arquivo_pdf) as pdf:
+
+        for pagina in pdf.pages:
+
+            texto = pagina.extract_text()
+
+            if not texto:
+                continue
+
+            linhas.extend(texto.splitlines())
+
+    return linhas
