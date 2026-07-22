@@ -18,15 +18,24 @@ Versão:
 """
 
 from pathlib import Path
+import csv
 
 import pdfplumber
 import re
 from dataclasses import dataclass
 
+CABECALHO_CSV = [
+    "Data",
+    "Hora",
+    "Duracao",
+    "Numero",
+    "Destino",
+    "Tipo",
+    "Valor",
+]
+
 @dataclass(slots=True)
 class LigacaoVivoBruta:
-    """Representa uma linha de ligação extraída da fatura da Vivo."""
-
     data: str
     hora: str
     duracao: str
@@ -34,6 +43,17 @@ class LigacaoVivoBruta:
     destino: str
     tipo: str
     valor: str
+
+    def para_lista(self) -> list[str]:
+        return [
+            self.data,
+            self.hora,
+            self.duracao,
+            self.numero,
+            self.destino,
+            self.tipo,
+            self.valor,
+        ]
 
 REGEX_DATA = re.compile(
     r"^\d{2}/\d{2}/\d{4}"
@@ -148,3 +168,27 @@ def _extrair_chamadas(
         )
 
     return ligacoes
+
+
+def _gravar_csv(
+    ligacoes: list[LigacaoVivoBruta],
+    arquivo_csv: Path,
+) -> None:
+
+    with arquivo_csv.open(
+        "w",
+        encoding="utf-8",
+        newline="",
+    ) as arquivo:
+
+        writer = csv.writer(
+            arquivo,
+            delimiter=";",
+        )
+
+        writer.writerow(CABECALHO_CSV)
+
+        for ligacao in ligacoes:
+            writer.writerow(
+                ligacao.para_lista()
+            )

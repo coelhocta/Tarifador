@@ -8,6 +8,7 @@ from extrai_vivo import _eh_ligacao
 from extrai_vivo import LigacaoVivoBruta
 from extrai_vivo import _converter_linha
 from extrai_vivo import _extrair_chamadas
+from extrai_vivo import _gravar_csv
 
 
 ARQUIVO_VALIDO = (
@@ -165,3 +166,77 @@ def teste_extrair_chamadas():
 
     assert ligacoes[0].numero == "99838-1378"
     assert ligacoes[1].numero == "3227-8099"
+    
+
+def teste_gravar_csv(tmp_path):
+
+    arquivo_csv = tmp_path / "saida.csv"
+
+    ligacoes = [
+        LigacaoVivoBruta(
+            data="18/06/2026",
+            hora="13:34:24",
+            duracao="00:04:42",
+            numero="99838-1378",
+            destino="AREA-035",
+            tipo="VC3",
+            valor="4,18",
+        ),
+        LigacaoVivoBruta(
+            data="18/06/2026",
+            hora="13:37:24",
+            duracao="00:01:00",
+            numero="3227-8099",
+            destino="BAURU",
+            tipo="DDD",
+            valor="0,61",
+        ),
+    ]
+
+    _gravar_csv(
+        ligacoes,
+        arquivo_csv,
+    )
+
+    assert arquivo_csv.exists()
+    
+
+def teste_conteudo_csv(tmp_path):
+
+    arquivo_csv = tmp_path / "saida.csv"
+
+    ligacoes = [
+        LigacaoVivoBruta(
+            data="18/06/2026",
+            hora="13:34:24",
+            duracao="00:04:42",
+            numero="99838-1378",
+            destino="AREA-035",
+            tipo="VC3",
+            valor="4,18",
+        ),
+        LigacaoVivoBruta(
+            data="18/06/2026",
+            hora="13:37:24",
+            duracao="00:01:00",
+            numero="3227-8099",
+            destino="BAURU",
+            tipo="DDD",
+            valor="0,61",
+        ),
+    ]
+
+    _gravar_csv(
+        ligacoes,
+        arquivo_csv,
+    )
+
+    conteudo = arquivo_csv.read_text(
+        encoding="utf-8"
+    ).splitlines()
+
+    assert conteudo == [
+        "Data;Hora;Duracao;Numero;Destino;Tipo;Valor",
+        "18/06/2026;13:34:24;00:04:42;99838-1378;AREA-035;VC3;4,18",
+        "18/06/2026;13:37:24;00:01:00;3227-8099;BAURU;DDD;0,61",
+    ]
