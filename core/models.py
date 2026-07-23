@@ -117,7 +117,7 @@ class Chamada:
 
     destino: str
 
-    tipo_destino: TipoDestino
+    tipo_destino: TipoDestino | None = None
 
     duracao_segundos: int
 

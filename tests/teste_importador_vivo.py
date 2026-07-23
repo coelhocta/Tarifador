@@ -4,6 +4,7 @@ from pathlib import Path
 
 from core.importador_vivo import carregar_chamadas
 from core.models import OrigemDados
+from core.models import TipoDestino
 
 
 def teste_csv_inexistente():

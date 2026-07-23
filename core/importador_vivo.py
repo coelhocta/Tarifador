@@ -5,7 +5,6 @@ from pathlib import Path
 from core.models import (
     ChamadaVivo,
     OrigemDados,
-    TipoDestino,
 )
 
 from core.utils import (
@@ -80,7 +79,6 @@ def _converter_linha(
         chave_comparacao_proximo_minuto=chave_comparacao_proximo_minuto,
         data_hora=data_hora,
         destino=destino,
-        tipo_destino=TipoDestino.DESCONHECIDO,
         duracao_segundos=_duracao_para_segundos(campos[2]),
         valor=Decimal(
             campos[6].replace(",", ".")
