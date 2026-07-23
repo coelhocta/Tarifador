@@ -1,3 +1,5 @@
+import pytest
+
 from pathlib import Path
 
 from core.importador_vivo import carregar_chamadas
@@ -42,3 +44,11 @@ def teste_importa_uma_ligacao():
     assert chamada.origem_dados == OrigemDados.VIVO
     assert chamada.destino == "3510-1711"
     assert chamada.duracao_segundos == 60
+    
+    
+def teste_linha_invalida():
+
+    with pytest.raises(ValueError):
+        carregar_chamadas(
+            Path("dados_teste/vivo_linha_invalida.csv")
+        )

@@ -50,6 +50,11 @@ def _converter_linha(
     campos: list[str],
 ) -> ChamadaVivo:
 
+    if len(campos) != 7:
+        raise ValueError(
+            f"Linha CSV inválida: {campos}"
+        )
+
     data_hora = texto_para_data_hora(
         f"{campos[0]} {campos[1]}"
     )
@@ -61,7 +66,7 @@ def _converter_linha(
         destino,
     )   
 
-    chave_comparacao_proximo = (
+    chave_comparacao_proximo_minuto = (
         gerar_chave_comparacao_proximo_minuto(
             data_hora,
             destino,
@@ -72,7 +77,7 @@ def _converter_linha(
         origem_dados=OrigemDados.VIVO,
         chave_id="",
         chave_comparacao=chave_comparacao,
-        chave_comparacao_proximo_minuto=chave_comparacao_proximo,
+        chave_comparacao_proximo_minuto=chave_comparacao_proximo_minuto,
         data_hora=data_hora,
         destino=destino,
         tipo_destino=TipoDestino.DESCONHECIDO,
