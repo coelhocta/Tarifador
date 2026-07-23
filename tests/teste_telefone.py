@@ -11,10 +11,12 @@ Descrição:
     Testes do módulo telefone.py
 
 Versão:
-    2.0.0
+    2.0.1
 
 =========================================================
 """
+
+from core.models import TipoDestino
 
 from core.telefone import (
     remover_prefixo_internacional,
@@ -27,201 +29,226 @@ from core.telefone import (
     telefone_comparacao,
 )
 
-from core.models import TipoDestino
-
-
-def testar(descricao, obtido, esperado):
-
-    if obtido == esperado:
-        print(f"✓ {descricao}")
-    else:
-        print(f"✗ {descricao}")
-        print(f"    Obtido..: {obtido}")
-        print(f"    Esperado: {esperado}")
-
-
-print()
-print("=" * 70)
-print("TESTES - TELEFONE")
-print("=" * 70)
-print()
 
 # ==========================================================
 # Prefixos
 # ==========================================================
 
-testar(
-    "Prefixo Internacional",
-    remover_prefixo_internacional("001632034091"),
-    "1632034091",
-)
+def teste_remover_prefixo_internacional():
 
-testar(
-    "Prefixo Operadora",
-    remover_prefixo_operadora("0151632034091"),
-    "1632034091",
-)
+    assert (
+        remover_prefixo_internacional("001632034091")
+        == "1632034091"
+    )
 
-testar(
-    "Zero Inicial",
-    remover_zero_inicial("01632034091"),
-    "1632034091",
-)
+
+def teste_remover_prefixo_operadora():
+
+    assert (
+        remover_prefixo_operadora("0151632034091")
+        == "1632034091"
+    )
+
+
+def teste_remover_zero_inicial():
+
+    assert (
+        remover_zero_inicial("01632034091")
+        == "1632034091"
+    )
+
 
 # ==========================================================
 # Normalização
 # ==========================================================
 
-testar(
-    "Normalização 1",
-    normalizar_numero("(16)3203-4091"),
-    "1632034091",
-)
+def teste_normalizacao_com_parenteses():
 
-testar(
-    "Normalização 2",
-    normalizar_numero("16 3203 4091"),
-    "1632034091",
-)
+    assert (
+        normalizar_numero("(16)3203-4091")
+        == "1632034091"
+    )
 
-testar(
-    "Normalização 3",
-    normalizar_numero("7001"),
-    "7001",
-)
+
+def teste_normalizacao_com_espacos():
+
+    assert (
+        normalizar_numero("16 3203 4091")
+        == "1632034091"
+    )
+
+
+def teste_normalizacao_ramal():
+
+    assert (
+        normalizar_numero("7001")
+        == "7001"
+    )
+
 
 # ==========================================================
 # Tipo
 # ==========================================================
 
-testar(
-    "Tipo Ramal",
-    identificar_tipo_destino("7001"),
-    TipoDestino.RAMAL,
-)
+def teste_tipo_ramal():
 
-testar(
-    "Tipo Local",
-    identificar_tipo_destino("32034091"),
-    TipoDestino.LOCAL,
-)
+    assert (
+        identificar_tipo_destino("7001")
+        == TipoDestino.RAMAL
+    )
 
-testar(
-    "Tipo DDD Fixo",
-    identificar_tipo_destino("1632034091"),
-    TipoDestino.DDD_FIXO,
-)
 
-testar(
-    "Tipo Celular",
-    identificar_tipo_destino("16998005377"),
-    TipoDestino.DDD_CELULAR,
-)
+def teste_tipo_local():
 
-testar(
-    "Tipo 0800",
-    identificar_tipo_destino("08001234567"),
-    TipoDestino.SERVICO_0800,
-)
+    assert (
+        identificar_tipo_destino("32034091")
+        == TipoDestino.LOCAL
+    )
 
-testar(
-    "Tipo 0300",
-    identificar_tipo_destino("03001234567"),
-    TipoDestino.SERVICO_0300,
-)
 
-testar(
-    "Tipo 300X",
-    identificar_tipo_destino("30031234"),
-    TipoDestino.SERVICO_300X,
-)
+def teste_tipo_ddd_fixo():
 
-testar(
-    "Tipo 400X",
-    identificar_tipo_destino("40041234"),
-    TipoDestino.SERVICO_400X,
-)
+    assert (
+        identificar_tipo_destino("1632034091")
+        == TipoDestino.DDD_FIXO
+    )
+
+
+def teste_tipo_celular():
+
+    assert (
+        identificar_tipo_destino("16998005377")
+        == TipoDestino.DDD_CELULAR
+    )
+
+
+def teste_tipo_0800():
+
+    assert (
+        identificar_tipo_destino("08001234567")
+        == TipoDestino.SERVICO_0800
+    )
+
+
+def teste_tipo_0300():
+
+    assert (
+        identificar_tipo_destino("03001234567")
+        == TipoDestino.SERVICO_0300
+    )
+
+
+def teste_tipo_300x():
+
+    assert (
+        identificar_tipo_destino("30031234")
+        == TipoDestino.SERVICO_300X
+    )
+
+
+def teste_tipo_400x():
+
+    assert (
+        identificar_tipo_destino("40041234")
+        == TipoDestino.SERVICO_400X
+    )
+
 
 # ==========================================================
 # DDD
 # ==========================================================
 
-testar(
-    "DDD Fixo",
-    extrair_ddd("1632034091"),
-    "16",
-)
+def teste_extrair_ddd_fixo():
 
-testar(
-    "DDD Celular",
-    extrair_ddd("16998005377"),
-    "16",
-)
+    assert (
+        extrair_ddd("1632034091")
+        == "16"
+    )
 
-testar(
-    "DDD Local",
-    extrair_ddd("32034091"),
-    "",
-)
+
+def teste_extrair_ddd_celular():
+
+    assert (
+        extrair_ddd("16998005377")
+        == "16"
+    )
+
+
+def teste_extrair_ddd_local():
+
+    assert (
+        extrair_ddd("32034091")
+        == ""
+    )
+
 
 # ==========================================================
 # Número Local
 # ==========================================================
 
-testar(
-    "Número Local Fixo",
-    extrair_numero_local("1632034091"),
-    "32034091",
-)
+def teste_numero_local_fixo():
 
-testar(
-    "Número Local Celular",
-    extrair_numero_local("16998005377"),
-    "998005377",
-)
+    assert (
+        extrair_numero_local("1632034091")
+        == "32034091"
+    )
 
-testar(
-    "Número Local",
-    extrair_numero_local("32034091"),
-    "32034091",
-)
+
+def teste_numero_local_celular():
+
+    assert (
+        extrair_numero_local("16998005377")
+        == "998005377"
+    )
+
+
+def teste_numero_local():
+
+    assert (
+        extrair_numero_local("32034091")
+        == "32034091"
+    )
+
 
 # ==========================================================
 # Comparação
 # ==========================================================
 
-testar(
-    "Comparação Ramal",
-    telefone_comparacao("7001"),
-    "7001",
-)
+def teste_comparacao_ramal():
 
-testar(
-    "Comparação Fixo",
-    telefone_comparacao("1632034091"),
-    "32034091",
-)
+    assert (
+        telefone_comparacao("7001")
+        == "7001"
+    )
 
-testar(
-    "Comparação Celular",
-    telefone_comparacao("16998005377"),
-    "998005377",
-)
 
-testar(
-    "Comparação Local",
-    telefone_comparacao("32034091"),
-    "32034091",
-)
+def teste_comparacao_fixo():
 
-testar(
-    "Comparação 0800",
-    telefone_comparacao("08001234567"),
-    "08001234567",
-)
+    assert (
+        telefone_comparacao("1632034091")
+        == "32034091"
+    )
 
-print()
-print("=" * 70)
-print("FIM DOS TESTES")
-print("=" * 70)
-print()
+
+def teste_comparacao_celular():
+
+    assert (
+        telefone_comparacao("16998005377")
+        == "998005377"
+    )
+
+
+def teste_comparacao_local():
+
+    assert (
+        telefone_comparacao("32034091")
+        == "32034091"
+    )
+
+
+def teste_comparacao_0800():
+
+    assert (
+        telefone_comparacao("08001234567")
+        == "08001234567"
+    )

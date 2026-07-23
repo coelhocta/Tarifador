@@ -1,22 +1,6 @@
-"""
-=========================================================
-SATA
-
-Sistema de Auditoria Telefônica para Asterisk
-
-Arquivo:
-    teste_ramais.py
-
-Descrição:
-    Testes do módulo ramais.py.
-
-Versão:
-    2.0.0
-
-=========================================================
-"""
-
 from pathlib import Path
+
+import pytest
 
 from ramais import carregar_ramais
 
@@ -24,91 +8,37 @@ from ramais import carregar_ramais
 ARQUIVO = Path("dados_teste") / "pjsip.ramais"
 
 
-def testar(descricao: str, obtido, esperado):
-    """
-    Exibe o resultado de um teste.
-    """
+@pytest.fixture(scope="module")
+def ramais():
 
-    if obtido == esperado:
-        print(f"✓ {descricao}")
-    else:
-        print(f"✗ {descricao}")
-        print(f"    Obtido..: {obtido}")
-        print(f"    Esperado: {esperado}")
+    return carregar_ramais(ARQUIVO)
 
 
-print()
-print("=" * 70)
-print("TESTES - RAMAIS")
-print("=" * 70)
-print()
+def teste_arquivo_carregado(ramais):
 
-print(f"Arquivo........: {ARQUIVO.resolve()}")
-print(f"Existe.........: {ARQUIVO.exists()}")
+    assert len(ramais) > 0
 
-print()
 
-ramais = carregar_ramais(ARQUIVO)
+def teste_ramal_5000_existe(ramais):
 
-testar(
-    "Arquivo carregado",
-    len(ramais) > 0,
-    True,
-)
+    assert "5000" in ramais
 
-print(f"Total Ramais...: {len(ramais)}")
 
-print()
+def teste_ramal_6001_existe(ramais):
 
-# ----------------------------------------------------------
-# Testes conhecidos do arquivo de exemplo
-# ----------------------------------------------------------
+    assert "6001" in ramais
 
-testar(
-    "Ramal 5000 existe",
-    "5000" in ramais,
-    True,
-)
 
-testar(
-    "Ramal 6001 existe",
-    "6001" in ramais,
-    True,
-)
+def teste_nome_ramal_5000(ramais):
 
-testar(
-    "Nome do ramal 5000",
-    ramais["5000"].nome,
-    "TESTE123",
-)
+    assert ramais["5000"].nome == "TESTE123"
 
-testar(
-    "Nome do ramal 6001",
-    ramais["6001"].nome,
-    "CCAE CMD VÍDEO CONF",
-)
 
-testar(
-    "Contexto do ramal 6001",
-    ramais["6001"].contexto,
-    "ramais",
-)
+def teste_nome_ramal_6001(ramais):
 
-print()
-print("-" * 70)
-print("Primeiros 10 ramais")
-print("-" * 70)
+    assert ramais["6001"].nome == "CCAE CMD VÍDEO CONF"
 
-for ramal in list(ramais.values())[:10]:
 
-    print(f"Ramal........: {ramal.numero}")
-    print(f"Nome.........: {ramal.nome}")
-    print(f"Contexto.....: {ramal.contexto}")
-    print(f"Call Group...: {ramal.call_group}")
-    print(f"Pickup Group.: {ramal.pickup_group}")
-    print()
+def teste_contexto_ramal_6001(ramais):
 
-print("=" * 70)
-print("FIM DOS TESTES")
-print("=" * 70)
-print()
+    assert ramais["6001"].contexto == "ramais"
