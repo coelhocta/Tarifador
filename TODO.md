@@ -59,9 +59,9 @@
 ## V1.4
 
 - [x] Criar estrutura de testes do módulo telefone
-- [ ] Implementar normalizar_numero()
+- [] Implementar normalizar_numero()
 - [ ] Implementar telefone_comparacao()
-- [ ] Implementar identificar_tipo_destino()
+- [x] Implementar identificar_tipo_destino()
 - [ ] Implementar extrair_ddd()
 - [ ] Implementar extrair_numero_local()
 - [ ] Implementar gerar_chaves()

@@ -1,0 +1,114 @@
+[1mdiff --git a/TODO.md b/TODO.md[m
+[1mindex a1376a3..641fa3c 100644[m
+[1m--- a/TODO.md[m
+[1m+++ b/TODO.md[m
+[36m@@ -59,9 +59,9 @@[m
+ ## V1.4[m
+ [m
+ - [x] Criar estrutura de testes do módulo telefone[m
+[31m-- [ ] Implementar normalizar_numero()[m
+[32m+[m[32m- [] Implementar normalizar_numero()[m
+ - [ ] Implementar telefone_comparacao()[m
+[31m-- [ ] Implementar identificar_tipo_destino()[m
+[32m+[m[32m- [x] Implementar identificar_tipo_destino()[m
+ - [ ] Implementar extrair_ddd()[m
+ - [ ] Implementar extrair_numero_local()[m
+ - [ ] Implementar gerar_chaves()[m
+[1mdiff --git a/core/models.py b/core/models.py[m
+[1mindex aece4ea..f9d39b0 100644[m
+[1m--- a/core/models.py[m
+[1m+++ b/core/models.py[m
+[36m@@ -152,3 +152,18 @@[m [mclass ChamadaVivo(Chamada):[m
+     """Registro proveniente da fatura Vivo."""[m
+ [m
+     valor: Decimal = Decimal("0")[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# ==========================================================[m
+[32m+[m[32m# Resultado da Conciliação[m
+[32m+[m[32m# ==========================================================[m
+[32m+[m
+[32m+[m[32m@dataclass(slots=True, kw_only=True)[m
+[32m+[m[32mclass ResultadoConciliacao:[m
+[32m+[m[32m    """Resultado da conciliação de uma cobrança da Vivo."""[m
+[32m+[m
+[32m+[m[32m    chamada_vivo: ChamadaVivo[m
+[32m+[m
+[32m+[m[32m    chamada_asterisk: ChamadaAsterisk | None = None[m
+[32m+[m
+[32m+[m[32m    status: StatusConciliacao = StatusConciliacao.PENDENTE[m
+\ No newline at end of file[m
+[1mdiff --git a/docs/REGRAS_NEGOCIO.md b/docs/REGRAS_NEGOCIO.md[m
+[1mindex b825a30..860ea4c 100644[m
+[1m--- a/docs/REGRAS_NEGOCIO.md[m
+[1m+++ b/docs/REGRAS_NEGOCIO.md[m
+[36m@@ -334,22 +334,6 @@[m [mFim.[m
+ [m
+ 3)[m
+ [m
+[31m-Número[m
+[31m-[m
+[31m-+[m
+[31m-[m
+[31m-Minuto anterior[m
+[31m-[m
+[31m-↓[m
+[31m-[m
+[31m-Encontrou[m
+[31m-[m
+[31m-Fim.[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-4)[m
+[31m-[m
+ Não encontrou[m
+ [m
+ ↓[m
+[36m@@ -428,4 +412,43 @@[m [mRelatórios gerenciais.[m
+ [m
+ # 16. Objetivo do SATA[m
+ [m
+[31m-Conferir automaticamente a fatura telefônica da operadora através da conciliação com os registros do Asterisk, permitindo identificar divergências, calcular custos por ramal e gerar relatórios gerenciais.[m
+\ No newline at end of file[m
+[32m+[m[32mConferir automaticamente a fatura telefônica da operadora através da conciliação com os registros do Asterisk, permitindo identificar divergências, calcular custos por ramal e gerar relatórios gerenciais.[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# 17. Fonte dos dados do relatório financeiro[m
+[32m+[m
+[32m+[m[32mA fatura da Vivo é a fonte oficial dos dados financeiros[m
+[32m+[m[32mdas chamadas.[m
+[32m+[m
+[32m+[m[32mOs seguintes dados devem ser obtidos exclusivamente da Vivo:[m
+[32m+[m
+[32m+[m[32m- Data[m
+[32m+[m[32m- Hora[m
+[32m+[m[32m- Destino[m
+[32m+[m[32m- Duração[m
+[32m+[m[32m- Valor[m
+[32m+[m
+[32m+[m[32mO Asterisk será utilizado na conciliação para identificar[m
+[32m+[m[32ma origem da chamada:[m
+[32m+[m
+[32m+[m[32m- Ramal[m
+[32m+[m[32m- Nome/Setor[m
+[32m+[m
+[32m+[m[32mO relatório financeiro será gerado a partir das chamadas[m
+[32m+[m[32mcobradas pela Vivo.[m
+[32m+[m
+[32m+[m[32mChamadas existentes somente no Asterisk não devem integrar[m
+[32m+[m[32mo relatório financeiro, pois podem representar chamadas que[m
+[32m+[m[32mnão geraram cobrança.[m
+[32m+[m
+[32m+[m[32mEssas chamadas poderão permanecer disponíveis para fins de[m
+[32m+[m[32mauditoria.[m
+[32m+[m
+[32m+[m[32mUma chamada existente na fatura Vivo para a qual não seja[m
+[32m+[m[32mpossível identificar uma chamada correspondente no Asterisk[m
+[32m+[m[32mdeve ser registrada como divergência.[m
+[32m+[m
+[32m+[m[32mQuando houver mais de uma chamada Asterisk candidata para[m
+[32m+[m[32muma mesma chamada Vivo, a duração deverá ser utilizada como[m
+[32m+[m[32mcritério adicional para determinar a correspondência mais[m
+[32m+[m[32mprovável.[m
+\ No newline at end of file[m

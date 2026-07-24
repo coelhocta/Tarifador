@@ -152,3 +152,18 @@ class ChamadaVivo(Chamada):
     """Registro proveniente da fatura Vivo."""
 
     valor: Decimal = Decimal("0")
+
+
+# ==========================================================
+# Resultado da Conciliação
+# ==========================================================
+
+@dataclass(slots=True, kw_only=True)
+class ResultadoConciliacao:
+    """Resultado da conciliação de uma cobrança da Vivo."""
+
+    chamada_vivo: ChamadaVivo
+
+    chamada_asterisk: ChamadaAsterisk | None = None
+
+    status: StatusConciliacao = StatusConciliacao.PENDENTE

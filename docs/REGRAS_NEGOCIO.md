@@ -334,22 +334,6 @@ Fim.
 
 3)
 
-Número
-
-+
-
-Minuto anterior
-
-↓
-
-Encontrou
-
-Fim.
-
----
-
-4)
-
 Não encontrou
 
 ↓
@@ -429,3 +413,42 @@ Relatórios gerenciais.
 # 16. Objetivo do SATA
 
 Conferir automaticamente a fatura telefônica da operadora através da conciliação com os registros do Asterisk, permitindo identificar divergências, calcular custos por ramal e gerar relatórios gerenciais.
+
+
+# 17. Fonte dos dados do relatório financeiro
+
+A fatura da Vivo é a fonte oficial dos dados financeiros
+das chamadas.
+
+Os seguintes dados devem ser obtidos exclusivamente da Vivo:
+
+- Data
+- Hora
+- Destino
+- Duração
+- Valor
+
+O Asterisk será utilizado na conciliação para identificar
+a origem da chamada:
+
+- Ramal
+- Nome/Setor
+
+O relatório financeiro será gerado a partir das chamadas
+cobradas pela Vivo.
+
+Chamadas existentes somente no Asterisk não devem integrar
+o relatório financeiro, pois podem representar chamadas que
+não geraram cobrança.
+
+Essas chamadas poderão permanecer disponíveis para fins de
+auditoria.
+
+Uma chamada existente na fatura Vivo para a qual não seja
+possível identificar uma chamada correspondente no Asterisk
+deve ser registrada como divergência.
+
+Quando houver mais de uma chamada Asterisk candidata para
+uma mesma chamada Vivo, a duração deverá ser utilizada como
+critério adicional para determinar a correspondência mais
+provável.
