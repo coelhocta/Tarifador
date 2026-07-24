@@ -169,3 +169,22 @@ class ResultadoConciliacao:
     chamada_asterisk: ChamadaAsterisk | None = None
 
     status: StatusConciliacao = StatusConciliacao.PENDENTE
+    
+    
+@dataclass(slots=True, kw_only=True)
+class RegistroCobranca:
+    """Registro de uma chamada que será apresentada para cobrança."""
+
+    ramal: str
+
+    nome_ramal: str
+
+    data_hora: datetime
+
+    destino: str
+
+    tipo_vivo: str
+
+    duracao_segundos: int
+
+    valor: Decimal

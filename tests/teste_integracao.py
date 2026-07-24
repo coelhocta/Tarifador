@@ -34,6 +34,7 @@ from core.importador_vivo import (
     carregar_chamadas as carregar_chamadas_vivo,
 )
 
+from core.cobranca import gerar_registros_cobranca
 
 def teste_pipeline_conciliacao():
 
@@ -198,3 +199,41 @@ def teste_pipeline_completo_com_csvs():
         resultado.chamada_vivo.valor
         == Decimal("0.61")
     )
+    
+    
+def teste_pipeline_completo_ate_cobranca():
+
+    chamadas_asterisk = carregar_chamadas_asterisk(
+        Path("dados_teste") / "asterisk_integracao.csv"
+    )
+
+    chamadas_vivo = carregar_chamadas_vivo(
+        Path("dados_teste") / "vivo_uma_ligacao.csv"
+    )
+
+    resultados = conciliar(
+        chamadas_asterisk,
+        chamadas_vivo,
+    )
+
+    registros = gerar_registros_cobranca(
+        resultados
+    )
+
+    assert len(registros) == 1
+
+    registro = registros[0]
+
+    # Identificação pelo Asterisk
+    assert registro.ramal == "7001"
+    assert registro.nome_ramal == "SETOR A"
+
+    # Informações oficiais da cobrança Vivo
+    assert registro.data_hora == datetime(
+        2026, 6, 25, 10, 2, 30
+    )
+
+    assert registro.destino == "3510-1711"
+    assert registro.tipo_vivo == "DDD"
+    assert registro.duracao_segundos == 60
+    assert registro.valor == Decimal("0.61")
