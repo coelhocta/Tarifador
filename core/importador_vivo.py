@@ -80,6 +80,7 @@ def _converter_linha(
         data_hora=data_hora,
         destino=destino,
         duracao_segundos=_duracao_para_segundos(campos[2]),
+        tipo_vivo=campos[5].strip(),
         valor=Decimal(
             campos[6].replace(",", ".")
         ),

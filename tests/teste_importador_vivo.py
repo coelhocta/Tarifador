@@ -45,6 +45,7 @@ def teste_importa_uma_ligacao():
     assert chamada.origem_dados == OrigemDados.VIVO
     assert chamada.destino == "3510-1711"
     assert chamada.duracao_segundos == 60
+    assert chamada.tipo_vivo == "DDD"
     
     
 def teste_linha_invalida():

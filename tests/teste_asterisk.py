@@ -17,8 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from asterisk import carregar_chamadas
-
+from core.importador_asterisk import carregar_chamadas
 
 ARQUIVO_VALIDO = (
     Path("dados_teste") / "asterisk_valido.csv"

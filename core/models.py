@@ -151,6 +151,8 @@ class ChamadaAsterisk(Chamada):
 class ChamadaVivo(Chamada):
     """Registro proveniente da fatura Vivo."""
 
+    tipo_vivo: str = ""
+
     valor: Decimal = Decimal("0")
 
 
