@@ -203,15 +203,19 @@ def _gravar_csv(
             )
             
             
-if __name__ == "__main__":
+def _extrair_chamadas(
+    linhas: list[str],
+) -> list[LigacaoVivoBruta]:
 
-    arquivo_pdf = Path("dados_teste") / "vivo_fatura_valida.pdf"
+    ligacoes = []
 
-    arquivo_csv = Path("dados_teste") / "Jun.26.VIVO.csv"
+    for linha in linhas:
 
-    extrair_pdf(
-        arquivo_pdf,
-        arquivo_csv,
-    )
+        if not _eh_ligacao(linha):
+            continue
 
-    print(f"CSV gerado: {arquivo_csv}")
+        ligacoes.append(
+            _converter_linha(linha)
+        )
+
+    return ligacoes

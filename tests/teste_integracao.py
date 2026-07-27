@@ -34,7 +34,13 @@ from core.importador_vivo import (
     carregar_chamadas as carregar_chamadas_vivo,
 )
 
+from core.exportador import (
+    exportar_cobrancas,
+    exportar_cobrancas_nao_identificadas,
+)
+
 from core.cobranca import gerar_registros_cobranca
+
 
 def teste_pipeline_conciliacao():
 
@@ -237,3 +243,71 @@ def teste_pipeline_completo_ate_cobranca():
     assert registro.tipo_vivo == "DDD"
     assert registro.duracao_segundos == 60
     assert registro.valor == Decimal("0.61")
+    
+    
+def teste_pipeline_completo_gera_arquivos(
+    tmp_path,
+):
+
+    chamadas_asterisk = carregar_chamadas_asterisk(
+        Path("dados_teste") / "asterisk_integracao.csv"
+    )
+
+    chamadas_vivo = carregar_chamadas_vivo(
+        Path("dados_teste") / "vivo_uma_ligacao.csv"
+    )
+
+    resultados = conciliar(
+        chamadas_asterisk,
+        chamadas_vivo,
+    )
+
+    registros = gerar_registros_cobranca(
+        resultados
+    )
+
+    arquivo_identificadas = (
+        tmp_path
+        / "cobrancas_identificadas.csv"
+    )
+
+    arquivo_nao_identificadas = (
+        tmp_path
+        / "cobrancas_nao_identificadas.csv"
+    )
+
+    exportar_cobrancas(
+        registros,
+        arquivo_identificadas,
+    )
+
+    exportar_cobrancas_nao_identificadas(
+        resultados,
+        arquivo_nao_identificadas,
+    )
+
+    assert arquivo_identificadas.exists()
+    assert arquivo_nao_identificadas.exists()
+
+    conteudo_identificadas = (
+        arquivo_identificadas.read_text(
+            encoding="utf-8-sig"
+        )
+    )
+
+    conteudo_nao_identificadas = (
+        arquivo_nao_identificadas.read_text(
+            encoding="utf-8-sig"
+        )
+    )
+
+    assert "7001" in conteudo_identificadas
+    assert "SETOR A" in conteudo_identificadas
+    assert "3510-1711" in conteudo_identificadas
+    assert "DDD" in conteudo_identificadas
+    assert "0,61" in conteudo_identificadas
+
+    assert (
+        "3510-1711"
+        not in conteudo_nao_identificadas
+    )

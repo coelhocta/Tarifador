@@ -36,3 +36,11 @@ Thumbs.db
 
 # Arquivos locais
 .env
+
+# Dados de processamento do SATA
+arquivos/entrada/asterisk/
+arquivos/entrada/vivo/
+arquivos/saida/
+
+# Ferramentas locais de analise
+analisa_diferenca_horarios.py

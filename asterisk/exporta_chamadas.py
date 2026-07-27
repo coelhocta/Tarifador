@@ -146,15 +146,20 @@ def exportar_chamadas():
             if destino.isdigit() and len(destino) == 4:
                 continue
 
-            inicio = linha[IDX_START].strip('"')
+            uniqueid = linha[IDX_UNIQUEID].strip('"')
 
-            if not inicio:
+            if not uniqueid:
                 continue
 
-            dt = datetime.strptime(
-                inicio,
-                "%Y-%m-%d %H:%M:%S"
-            )
+            try:
+                timestamp = int(
+                    uniqueid.split(".")[0]
+                )
+
+                dt = datetime.fromtimestamp(timestamp)
+
+            except (ValueError, OSError):
+                continue
 
             if not (data_inicio <= dt.date() <= data_fim):
                 continue
@@ -224,3 +229,4 @@ def exportar_chamadas():
 
 if __name__ == "__main__":
     exportar_chamadas()
+
