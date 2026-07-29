@@ -27,8 +27,10 @@ from core.models import (
     StatusConciliacao,
 )
 
-from core.padroes import construir_historico
-
+from core.padroes import (
+    construir_historico,
+    obter_ramal_preferencial,
+)
 
 def criar_resultado(
     destino: str,
@@ -129,3 +131,38 @@ def teste_ignora_resultados_nao_conciliados():
     assert historico["33389039"]["7476"] == 1
 
     assert "7478" not in historico["33389039"]
+    
+    
+def teste_retorna_ramal_preferencial():
+
+    resultados = []
+
+    for _ in range(12):
+
+        resultados.append(
+            criar_resultado(
+                "33389039",
+                "7476",
+                StatusConciliacao.ENCONTRADA,
+            )
+        )
+
+    for _ in range(3):
+
+        resultados.append(
+            criar_resultado(
+                "33389039",
+                "7478",
+                StatusConciliacao.ENCONTRADA,
+            )
+        )
+
+    historico = construir_historico(resultados)
+
+    assert (
+        obter_ramal_preferencial(
+            historico,
+            "33389039",
+        )
+        == "7476"
+    )

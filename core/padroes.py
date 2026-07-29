@@ -23,6 +23,8 @@ from core.models import (
     StatusConciliacao,
 )
 
+MIN_OCORRENCIAS_PADRAO = 10
+
 
 def construir_historico(
     resultados: list[ResultadoConciliacao],
@@ -62,3 +64,27 @@ def construir_historico(
         historico[destino][ramal] += 1
 
     return historico
+
+
+def obter_ramal_preferencial(
+    historico: dict[str, Counter],
+    destino: str,
+) -> str | None:
+    """
+    Retorna o ramal mais frequente para um destino.
+
+    Apenas considera destinos que possuam pelo menos
+    MIN_OCORRENCIAS_PADRAO ocorrências.
+    """
+
+    contador = historico.get(destino)
+
+    if contador is None:
+        return None
+
+    ramal, ocorrencias = contador.most_common(1)[0]
+
+    if ocorrencias < MIN_OCORRENCIAS_PADRAO:
+        return None
+
+    return ramal
