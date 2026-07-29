@@ -1,0 +1,64 @@
+"""
+=========================================================
+SATA
+
+Sistema de Auditoria Telefônica para Asterisk
+
+Arquivo:
+    padroes.py
+
+Descrição:
+    Construção do histórico de padrões de ligação.
+
+Versão:
+    1.0.0
+
+=========================================================
+"""
+
+from collections import Counter
+
+from core.models import (
+    ResultadoConciliacao,
+    StatusConciliacao,
+)
+
+
+def construir_historico(
+    resultados: list[ResultadoConciliacao],
+) -> dict[str, Counter]:
+    """
+    Constrói um histórico de ocorrências por destino.
+
+    Apenas chamadas conciliadas com sucesso são utilizadas.
+
+    Retorna:
+
+    {
+        destino: Counter({
+            ramal: quantidade
+        })
+    }
+    """
+
+    historico: dict[str, Counter] = {}
+
+    for resultado in resultados:
+
+        if (
+            resultado.status
+            != StatusConciliacao.ENCONTRADA
+        ):
+            continue
+
+        destino = resultado.chamada_vivo.chave_comparacao.split("|")[1]
+
+        ramal = resultado.chamada_asterisk.ramal
+
+        if destino not in historico:
+
+            historico[destino] = Counter()
+
+        historico[destino][ramal] += 1
+
+    return historico
