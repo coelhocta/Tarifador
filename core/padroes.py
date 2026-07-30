@@ -23,7 +23,7 @@ from core.models import (
     StatusConciliacao,
 )
 
-MIN_OCORRENCIAS_PADRAO = 10
+MIN_OCORRENCIAS_PADRAO = 2
 
 
 def construir_historico(
@@ -88,3 +88,37 @@ def obter_ramal_preferencial(
         return None
 
     return ramal
+
+
+def construir_indice_ramais(
+    resultados: list[ResultadoConciliacao],
+) -> dict[str, str]:
+    """
+    Constrói um índice contendo o nome de cada ramal.
+
+    Retorna:
+
+    {
+        "7476": "Andre",
+        "7480": "Carlos",
+    }
+    """
+
+    indice: dict[str, str] = {}
+
+    for resultado in resultados:
+
+        if (
+            resultado.status
+            != StatusConciliacao.ENCONTRADA
+        ):
+            continue
+
+        chamada = resultado.chamada_asterisk
+
+        if chamada is None:
+            continue
+
+        indice[chamada.ramal] = chamada.nome_ramal
+
+    return indice

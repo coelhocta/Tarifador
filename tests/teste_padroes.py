@@ -137,8 +137,10 @@ def teste_retorna_ramal_preferencial():
 
     resultados = []
 
-    for _ in range(12):
+    resultados = []
 
+    # Ramal preferencial
+    for _ in range(2):
         resultados.append(
             criar_resultado(
                 "33389039",
@@ -147,12 +149,36 @@ def teste_retorna_ramal_preferencial():
             )
         )
 
-    for _ in range(3):
+    # Outro ramal
+    resultados.append(
+        criar_resultado(
+            "33389039",
+            "7478",
+            StatusConciliacao.ENCONTRADA,
+        )
+    )
+
+    historico = construir_historico(resultados)
+
+    assert (
+        obter_ramal_preferencial(
+            historico,
+            "33389039",
+        )
+        == "7476"
+    )
+    
+    
+def teste_nao_retorna_ramal_com_poucas_ocorrencias():
+
+    resultados = []
+
+    for _ in range(1):
 
         resultados.append(
             criar_resultado(
                 "33389039",
-                "7478",
+                "7476",
                 StatusConciliacao.ENCONTRADA,
             )
         )
@@ -164,5 +190,5 @@ def teste_retorna_ramal_preferencial():
             historico,
             "33389039",
         )
-        == "7476"
+        is None
     )
