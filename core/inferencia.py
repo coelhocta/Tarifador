@@ -14,9 +14,15 @@ Descrição:
 =========================================================
 """
 
-from core.models import ResultadoConciliacao
+from core.models import (
+    ResultadoConciliacao,
+    StatusConciliacao,
+)
 
-from core.padroes import construir_historico
+from core.padroes import (
+    construir_historico,
+    obter_ramal_preferencial,
+)
 
 
 def aplicar_inferencia(
@@ -28,5 +34,27 @@ def aplicar_inferencia(
 
     historico = construir_historico(resultados)
 
-    # Ainda não faz nada.
-    _ = historico
+    for resultado in resultados:
+
+        if (
+            resultado.status
+            != StatusConciliacao.NAO_ENCONTRADA
+        ):
+            continue
+
+        destino = (
+            resultado.chamada_vivo
+            .chave_comparacao
+            .split("|")[1]
+        )
+
+        ramal = obter_ramal_preferencial(
+            historico,
+            destino,
+        )
+
+        if ramal is None:
+            continue
+
+        # Implementação virá no próximo commit.
+        _ = ramal
