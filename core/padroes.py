@@ -33,14 +33,6 @@ def construir_historico(
     Constrói um histórico de ocorrências por destino.
 
     Apenas chamadas conciliadas com sucesso são utilizadas.
-
-    Retorna:
-
-    {
-        destino: Counter({
-            ramal: quantidade
-        })
-    }
     """
 
     historico: dict[str, Counter] = {}
@@ -53,12 +45,15 @@ def construir_historico(
         ):
             continue
 
-        destino = resultado.chamada_vivo.chave_comparacao.split("|")[1]
+        destino = (
+            resultado.chamada_vivo
+            .chave_comparacao
+            .split("|")[1]
+        )
 
         ramal = resultado.chamada_asterisk.ramal
 
         if destino not in historico:
-
             historico[destino] = Counter()
 
         historico[destino][ramal] += 1

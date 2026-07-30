@@ -30,6 +30,7 @@ from core.models import (
 from core.padroes import (
     construir_historico,
     obter_ramal_preferencial,
+    construir_indice_ramais,
 )
 
 def criar_resultado(
@@ -192,3 +193,31 @@ def teste_nao_retorna_ramal_com_poucas_ocorrencias():
         )
         is None
     )
+    
+    
+def teste_constroi_indice_ramais():
+
+    resultado1 = criar_resultado(
+        "11999999999",
+        "7476",
+        StatusConciliacao.ENCONTRADA,
+    )
+
+    resultado1.chamada_asterisk.nome_ramal = "Andre"
+
+    resultado2 = criar_resultado(
+        "11888888888",
+        "7480",
+        StatusConciliacao.ENCONTRADA,
+    )
+
+    resultado2.chamada_asterisk.nome_ramal = "Carlos"
+
+    indice = construir_indice_ramais(
+        [resultado1, resultado2]
+    )
+
+    assert indice == {
+        "7476": "Andre",
+        "7480": "Carlos",
+    }
