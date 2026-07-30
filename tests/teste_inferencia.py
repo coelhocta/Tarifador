@@ -1,10 +1,25 @@
-from core.inferencia import inferir_resultados
+"""
+=========================================================
+SATA
+
+Sistema de Auditoria Telefônica para Asterisk
+
+Arquivo:
+    teste_inferencia.py
+
+Descrição:
+    Testes do módulo inferencia.py
+
+=========================================================
+"""
+
+from core.inferencia import aplicar_inferencia
 
 
-def teste_inferencia_sem_resultados():
+def teste_aplicar_inferencia_sem_resultados():
 
     resultados = []
 
-    inferir_resultados(resultados)
+    aplicar_inferencia(resultados)
 
     assert resultados == []

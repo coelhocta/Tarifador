@@ -16,12 +16,17 @@ Descrição:
 
 from core.models import ResultadoConciliacao
 
+from core.padroes import construir_historico
 
-def inferir_resultados(
+
+def aplicar_inferencia(
     resultados: list[ResultadoConciliacao],
 ) -> None:
     """
     Aplica inferência aos resultados da conciliação.
     """
 
-    pass
+    historico = construir_historico(resultados)
+
+    # Ainda não faz nada.
+    _ = historico
