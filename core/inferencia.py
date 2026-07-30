@@ -21,6 +21,7 @@ from core.models import (
 
 from core.padroes import (
     construir_historico,
+    construir_indice_ramais,
     obter_ramal_preferencial,
 )
 
@@ -33,6 +34,7 @@ def aplicar_inferencia(
     """
 
     historico = construir_historico(resultados)
+    indice_ramais = construir_indice_ramais(resultados)
 
     for resultado in resultados:
 
@@ -56,5 +58,12 @@ def aplicar_inferencia(
         if ramal is None:
             continue
 
-        # Implementação virá no próximo commit.
-        _ = ramal
+        resultado.status = (
+            StatusConciliacao.INFERIDA
+        )
+
+        resultado.ramal_inferido = ramal
+
+        resultado.nome_ramal_inferido = (
+            indice_ramais[ramal]
+        )
