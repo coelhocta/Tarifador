@@ -194,3 +194,14 @@ class RegistroCobranca:
     duracao_segundos: int
 
     valor: Decimal
+    
+    
+@dataclass(slots=True)
+class EstatisticaRamal:
+    """
+    Estatísticas de utilização de um ramal
+    para um determinado destino.
+    """
+
+    nome: str
+    ocorrencias: int = 0

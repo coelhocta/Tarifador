@@ -20,6 +20,7 @@ from collections import Counter
 
 from core.models import (
     ChamadaAsterisk,
+    EstatisticaRamal,
     ResultadoConciliacao,
     StatusConciliacao,
 )
@@ -122,13 +123,16 @@ def construir_indice_ramais(
 
 def construir_historico_asterisk(
     chamadas: list[ChamadaAsterisk],
-) -> dict[str, Counter]:
+) -> dict[str, dict[str, EstatisticaRamal]]:
     """
     Constrói um histórico completo de destinos
     utilizando todas as chamadas do Asterisk.
     """
 
-    historico: dict[str, Counter] = {}
+    historico: dict[
+        str,
+        dict[str, EstatisticaRamal],
+    ] = {}
 
     for chamada in chamadas:
 
@@ -138,10 +142,33 @@ def construir_historico_asterisk(
         )
 
         if destino not in historico:
-            historico[destino] = Counter()
+            historico[destino] = {}
+
+        if chamada.ramal not in historico[destino]:
+
+            historico[destino][chamada.ramal] = EstatisticaRamal(
+                nome=chamada.nome_ramal,
+            )
 
         historico[destino][
             chamada.ramal
-        ] += 1
+        ].ocorrencias += 1
 
     return historico
+
+
+def construir_indice_ramais_asterisk(
+    chamadas: list[ChamadaAsterisk],
+) -> dict[str, str]:
+    """
+    Constrói um índice contendo o nome de cada ramal
+    utilizando todas as chamadas do Asterisk.
+    """
+
+    indice: dict[str, str] = {}
+
+    for chamada in chamadas:
+
+        indice[chamada.ramal] = chamada.nome_ramal
+
+    return indice
