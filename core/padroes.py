@@ -25,6 +25,8 @@ from core.models import (
     StatusConciliacao,
 )
 
+from core.telefone import telefone_comparacao
+
 MIN_OCORRENCIAS_PADRAO = 2
 
 
@@ -136,9 +138,8 @@ def construir_historico_asterisk(
 
     for chamada in chamadas:
 
-        destino = (
-            chamada.chave_comparacao
-            .split("|")[1]
+        destino = telefone_comparacao(
+            chamada.destino
         )
 
         if destino not in historico:
