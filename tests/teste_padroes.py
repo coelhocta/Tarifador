@@ -25,13 +25,16 @@ from core.models import (
     OrigemDados,
     ResultadoConciliacao,
     StatusConciliacao,
+    EstatisticaRamal,
 )
 
 from core.padroes import (
     construir_historico,
     obter_ramal_preferencial,
     construir_indice_ramais,
+    obter_estatistica_preferencial,
 )
+
 
 def criar_resultado(
     destino: str,
@@ -221,3 +224,115 @@ def teste_constroi_indice_ramais():
         "7476": "Andre",
         "7480": "Carlos",
     }
+    
+    
+def teste_obter_estatistica_preferencial():
+
+    historico = {
+
+        "999626098": {
+
+            "7479": EstatisticaRamal(
+                nome="Financeiro",
+                ocorrencias=10,
+            ),
+
+            "7480": EstatisticaRamal(
+                nome="Almoxarifado",
+                ocorrencias=3,
+            ),
+        }
+    }
+
+    resultado = obter_estatistica_preferencial(
+        historico,
+        "999626098",
+    )
+
+    assert resultado is not None
+
+    ramal, estatistica = resultado
+
+    assert ramal == "7479"
+    assert estatistica.nome == "Financeiro"
+    assert estatistica.ocorrencias == 10
+    
+    
+def teste_obter_estatistica_preferencial_destino_inexistente():
+
+    historico = {}
+
+    resultado = obter_estatistica_preferencial(
+        historico,
+        "999626098",
+    )
+
+    assert resultado is None
+    
+    
+def teste_obter_estatistica_preferencial_empate():
+
+    historico = {
+
+        "999626098": {
+
+            "7479": EstatisticaRamal(
+                nome="Financeiro",
+                ocorrencias=12,
+            ),
+
+            "7480": EstatisticaRamal(
+                nome="Almoxarifado",
+                ocorrencias=12,
+            ),
+        }
+    }
+
+    resultado = obter_estatistica_preferencial(
+        historico,
+        "999626098",
+    )
+
+    assert resultado is not None
+
+    ramal, estatistica = resultado
+
+    assert ramal == "7479"
+    assert estatistica.nome == "Financeiro"
+    
+    
+def teste_obter_estatistica_preferencial_retorna_maior_ocorrencia():
+
+    historico = {
+
+        "999626098": {
+
+            "7479": EstatisticaRamal(
+                nome="Financeiro",
+                ocorrencias=10,
+            ),
+
+            "7480": EstatisticaRamal(
+                nome="Almoxarifado",
+                ocorrencias=9,
+            ),
+
+            "7481": EstatisticaRamal(
+                nome="Comercial",
+                ocorrencias=3,
+            ),
+        }
+    }
+
+    resultado = obter_estatistica_preferencial(
+        historico,
+        "999626098",
+    )
+
+    assert resultado is not None
+
+    ramal, estatistica = resultado
+
+    assert ramal == "7479"
+    assert estatistica.nome == "Financeiro"
+    assert estatistica.ocorrencias == 10

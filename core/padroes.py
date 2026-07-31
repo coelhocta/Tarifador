@@ -172,3 +172,44 @@ def construir_indice_ramais_asterisk(
         indice[chamada.ramal] = chamada.nome_ramal
 
     return indice
+
+
+def obter_estatistica_preferencial(
+    historico: dict[
+        str,
+        dict[str, EstatisticaRamal],
+    ],
+    destino: str,
+) -> tuple[str, EstatisticaRamal] | None:
+    """
+    Retorna o ramal com maior número de ocorrências para um destino.
+
+    Em caso de empate entre os ramais com maior número de ocorrências,
+    retorna o primeiro ramal encontrado no histórico.
+    """
+
+    estatisticas = historico.get(destino)
+
+    if estatisticas is None:
+        return None
+
+    melhor_ramal = None
+    melhor_estatistica = None
+
+    for ramal, estatistica in estatisticas.items():
+
+        if (
+            melhor_estatistica is None
+            or estatistica.ocorrencias
+            > melhor_estatistica.ocorrencias
+        ):
+            melhor_ramal = ramal
+            melhor_estatistica = estatistica
+
+    if melhor_estatistica is None:
+        return None
+
+    return (
+        melhor_ramal,
+        melhor_estatistica,
+    )
