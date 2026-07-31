@@ -157,3 +157,45 @@ def teste_gera_somente_cobrancas_identificadas():
     assert registro.nome_ramal == "SETOR A"
     assert registro.tipo_vivo == "DDD"
     assert registro.valor == Decimal("0.61")
+    
+    
+def teste_gera_cobranca_com_ramal_inferido():
+
+    chamada_vivo = ChamadaVivo(
+        origem_dados=OrigemDados.VIVO,
+        chave_id="",
+        chave_comparacao="2026-06-25 10:02|35101711",
+        chave_comparacao_proximo_minuto="2026-06-25 10:03|35101711",
+        data_hora=datetime(2026, 6, 25, 10, 2, 30),
+        destino="3510-1711",
+        duracao_segundos=60,
+        tipo_vivo="DDD",
+        valor=Decimal("0.61"),
+    )
+
+    resultado = ResultadoConciliacao(
+        chamada_vivo=chamada_vivo,
+        chamada_asterisk=None,
+        status=StatusConciliacao.INFERIDA,
+        ramal_inferido="7001",
+        nome_ramal_inferido="SETOR A",
+    )
+
+    registros = gerar_registros_cobranca(
+        [resultado]
+    )
+
+    assert len(registros) == 1
+
+    registro = registros[0]
+
+    assert registro.ramal == "7001"
+    assert registro.nome_ramal == "SETOR A"
+
+    assert registro.data_hora == datetime(
+        2026, 6, 25, 10, 2, 30
+    )
+    assert registro.destino == "3510-1711"
+    assert registro.tipo_vivo == "DDD"
+    assert registro.duracao_segundos == 60
+    assert registro.valor == Decimal("0.61")

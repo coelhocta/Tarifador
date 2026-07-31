@@ -67,6 +67,8 @@ class StatusConciliacao(Enum):
 
     ENCONTRADA = auto()
 
+    INFERIDA = auto()
+
     DIFERENCA_DURACAO = auto()
 
     DUPLICADA = auto()
@@ -169,6 +171,10 @@ class ResultadoConciliacao:
     chamada_asterisk: ChamadaAsterisk | None = None
 
     status: StatusConciliacao = StatusConciliacao.PENDENTE
+
+    ramal_inferido: str | None = None
+
+    nome_ramal_inferido: str = ""
     
     
 @dataclass(slots=True, kw_only=True)
@@ -188,3 +194,14 @@ class RegistroCobranca:
     duracao_segundos: int
 
     valor: Decimal
+    
+    
+@dataclass(slots=True)
+class EstatisticaRamal:
+    """
+    Estatísticas de utilização de um ramal
+    para um determinado destino.
+    """
+
+    nome: str
+    ocorrencias: int = 0

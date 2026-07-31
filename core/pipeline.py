@@ -28,6 +28,11 @@ from core.importador_vivo import (
     carregar_chamadas as carregar_chamadas_vivo,
 )
 
+from core.inferencia import aplicar_inferencia
+
+from core.inferencia_asterisk import (
+    aplicar_inferencia_asterisk,
+)
 
 def executar_pipeline(
     arquivo_asterisk: Path,
@@ -50,6 +55,13 @@ def executar_pipeline(
     resultados = conciliar(
         chamadas_asterisk,
         chamadas_vivo,
+    )
+
+    aplicar_inferencia(resultados)
+
+    aplicar_inferencia_asterisk(
+        resultados,
+        chamadas_asterisk,
     )
 
     registros = gerar_registros_cobranca(
